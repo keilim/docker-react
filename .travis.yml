@@ -1,0 +1,15 @@
+#needs to have full permission
+sudo: required
+#it needs to have docker installed
+services:
+  - docker
+
+#Before we run our test
+#we have to build our image
+before_install:
+  - docker build -t keilim/docker-react -f Dockerfile.dev .
+
+#npm run test normally runs it and hangs there
+#we put -- --coverage so that npm run test auto exist
+script:
+  - docker container run keilim/docker-react npm run test -- --coverage
