@@ -13,3 +13,27 @@ before_install:
 #we put -- --coverage so that npm run test auto exist
 script:
   - docker container run keilim/docker-react npm run test -- --coverage
+
+#Deployment work
+deploy:
+  #Travis CI knows that we want to auto deploy to EBS
+  provider: elasticbeanstalk
+  #Depends on where we deploy our instance 
+  region: "us-east-2"
+  #name of our app
+  app: "docker-react"
+  #Environment name
+  env: "DockerReact-env"
+  #Travis will copy everything to a s3 bucket and tell ESB to use that bucket
+  #You can find it in S3 where the name of the bucket is the same as the region
+  bucket_name: "elasticbeanstalk-us-east-2-275676278532"
+  #The bucket path is where the folder is in the bucket
+  #By default it is the app name
+  bucket_path: "docker-react"
+  #Anytime we push the branch to master, we deploy
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key:
+    #We have to put this one with double quotes
+    secure: "$AWS_SECRET_KEY"
