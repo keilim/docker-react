@@ -1,0 +1,23 @@
+sudo: required
+services:
+    - docker
+
+before_install:
+    - docker build -t keilim/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+    - docker run keilim/react-test npm test -- --coverage
+
+after_success:
+    - docker build -t keilim/multi-client ./client
+    - docker build -t keilim/multi-nginx ./nginx
+    - docker build -t keilim/multi-server ./server
+    - docker build -t keilim/multi-worker ./worker
+
+    #log in to the docker cli
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    #take those images and push them to docker hub
+    - docker push keilim/multi-client
+    - docker push keilim/multi-nginx
+    - docker push keilim/multi-server
+    - docker push keilim/multi-worker
